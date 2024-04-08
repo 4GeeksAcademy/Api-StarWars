@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, Personaje, Planeta
 #from models import Person
 
 app = Flask(__name__)
@@ -38,12 +38,58 @@ def sitemap():
 
 @app.route('/user', methods=['GET'])
 def handle_hello():
+    users = User.query.all()
 
-    response_body = {
-        "msg": "Hello, this is your GET /user response "
-    }
+    response_body = [user.serialize() for user in users]
 
     return jsonify(response_body), 200
+
+
+@app.route('/personaje', methods=['GET'])
+def get_personajes():
+  
+    personajes = Personaje.query.all()
+
+    # Serializar los personajes y crear una lista de diccionarios
+    serialized_personajes = [personaje.serialize() for personaje in personajes]
+
+    # Devolver la lista de personajes como una respuesta JSON
+    return jsonify(serialized_personajes), 200
+
+
+@app.route('/people/<int:people_id>', methods=['GET'])
+def get_Onepersonaje(people_id):
+
+    personaje = Personaje.query.get(people_id)
+    
+    if personaje: 
+        serialized_personaje = personaje.serialize()
+        return jsonify(serialized_personaje), 200
+    else:
+        return jsonify({'message': 'Personaje no encontrado'}), 404
+
+
+@app.route('/planets', methods =['GET'])
+def get_planeta():
+    planets = Planeta.query.all()
+
+    response_body = [planet.serialize() for planet in planets]
+
+    return jsonify(response_body), 200
+
+@app.route('/planets/<int:planet_id>', methods=['GET'])
+def get_Oneplaneta(planet_id):
+
+    planeta = Planeta.query.get(planet_id)
+    
+    if planeta: 
+        serialized_planeta = planeta.serialize()
+        return jsonify(serialized_planeta), 200
+    else:
+        return jsonify({'message': 'Planeta no encontrado'}), 404
+    
+
+
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
